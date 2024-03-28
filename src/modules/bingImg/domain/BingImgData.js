@@ -37,7 +37,7 @@ class BingImgData {
     constructor(data) {
         if (!data) return;
         this.data = data;
-        this.url = this.baseUrl + data.images.urlbase;
+        this.url = this.baseUrl + data.images[0].urlbase;
     }
 }
 
