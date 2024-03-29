@@ -3,6 +3,8 @@ const {ModuleType} = require("./base/ModuleType");
 const {ConfigUtil} = require("./utils/ConfigUtil");
 const {ActionRoute} = require("./base/ActionRoute");
 const {ActionModuleType} = require("./base/ActionModuleType");
+const {GetMap} = require("./base/GetMap");
+const {MapBase} = require("./base/MapBase");
 
 /**
  * 构建路由
@@ -32,16 +34,22 @@ class BuildRoute {
             }
             // 组装路由
             const routes = {};
-            for (let k in actions) {
-                const action = actions[k];
-                const propertyNames = Object.getOwnPropertyNames(Object.getPrototypeOf(action));
-                const methods = propertyNames.filter(prop => typeof action[prop] === 'function' && prop.startsWith('$$'));
-                for (let method of methods) {
-                    const route = k + '/' + method.replace('$$', '');
-                    routes[route] = new ActionRoute(route, action, action[method]);
+            for (let actionName in actions) {
+                const action = actions[actionName];
+                let propertyNames = Object.getOwnPropertyNames(Object.getPrototypeOf(action));
+                propertyNames = propertyNames.concat(Object.getOwnPropertyNames(action));
+                const methodNames = propertyNames.filter(prop => action[prop] instanceof MapBase);
+                for (let methodName of methodNames) {
+                    const map = action[methodName];
+                    if (map.path) {
+                        const route = (actionName.toLowerCase() + '/' + map.path.toLowerCase()).replace(/\/\//g, "/");
+                        routes[route] = new ActionRoute(route, action, map.handle).setMap(map);
+                    } else {
+                        const route = (actionName.toLowerCase() + '/' + methodName.toLowerCase()).replace(/\/\//g, "/");
+                        routes[route] = new ActionRoute(route, action, map.handle).setMap(map);
+                    }
                 }
             }
-
             cb && cb(routes);
         });
     }

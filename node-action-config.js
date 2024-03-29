@@ -4,5 +4,7 @@ exports.config = {
     // 接口类扫描路径
     actionPath: 'src/actions',
     // 全局异常处理类
-    errorAdvice: 'src/advice/GlobalErrorAdvice'
+    errorAdvice: 'src/advice/GlobalErrorAdvice',
+    // 是否允许跨域
+    allowCross: true
 }

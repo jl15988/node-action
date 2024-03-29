@@ -2,7 +2,7 @@
 
 ## 1. 接口类
 
-在类上添加 type = 'action' 表明当前是一个接口类，项目中提供了 ModuleType 类，可直接选择其中的类型
+在类上添加 type = 'action' 表明当前是一个接口类（接口类名称默认会添加到请求路径中），项目中提供了 ModuleType 类，可直接选择其中的类型
 
 包括：action（html）、jsonAction（json）、textAction（纯文本）
 
@@ -14,16 +14,24 @@ class BingImg {
 }
 ```
 
-## 2. 方法名
+## 2. 接口方法
 
-方法名以 $$ 开头将被识别为接口方法
+接口方法通过创建 GetMap 和 PostMap 来创建，你可以传递请求路径，如果不传则默认属性名则是请求路径
 
 ```js
 class BingImg {
 
-    $$getData() {
+    type = ModuleType.jsonAction;
+
+    // 没有定义请求路径，默认请求路径为 /getData
+    getData = new GetMap(() => {
         
-    }
+    })
+
+    // 自定义请求路径为 /set
+    setData = new PostMap('/set', () => {
+        
+    })
 }
 ```
 
@@ -34,9 +42,9 @@ class BingImg {
 ```js
 class BingImg {
 
-    $$getData({number}) {
+    getData = new GetMap(({number}) => {
 
-    }
+    })
 }
 ```
 
@@ -67,6 +75,8 @@ exports.config = {
     // 接口类扫描路径
     actionPath: 'src/actions',
     // 全局异常处理类
-    errorAdvice: 'src/advice/GlobalErrorAdvice'
+    errorAdvice: 'src/advice/GlobalErrorAdvice',
+    // 是否允许跨域
+    allowCross: true
 }
 ```

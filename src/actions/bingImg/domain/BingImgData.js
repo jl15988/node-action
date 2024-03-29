@@ -2,7 +2,7 @@
  * 必应图片数据
  */
 class BingImgData {
-    baseUrl = "https://www.bing.com/";
+    baseUrl = "https://www.bing.com";
     url = "";
 
     data = {
@@ -37,7 +37,7 @@ class BingImgData {
     constructor(data) {
         if (!data) return;
         this.data = data;
-        this.url = this.baseUrl + data.images[0].urlbase;
+        this.url = this.baseUrl + data.images[0].urlbase + '_UHD.jpg';
     }
 }
 

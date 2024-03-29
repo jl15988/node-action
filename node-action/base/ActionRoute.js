@@ -2,13 +2,19 @@ class ActionRoute {
     route;
     action;
     type;
-    method;
+    handle;
+    map;
 
-    constructor(route, action, method) {
+    constructor(route, action, handle) {
         this.route = route;
         this.action = action;
         this.type = action.type;
-        this.method = method;
+        this.handle = handle;
+    }
+
+    setMap(map) {
+        this.map = map;
+        return this;
     }
 }
 

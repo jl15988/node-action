@@ -5,7 +5,14 @@ class JSONUtil {
      * @returns {boolean}
      */
     isJSON(obj) {
-        if (typeof obj !== 'object' || obj === null) {
+        if (typeof obj === 'string') {
+            try {
+                JSON.parse(obj);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        } else if (typeof obj !== 'object' || obj === null) {
             return false;
         }
 

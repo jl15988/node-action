@@ -10,7 +10,9 @@ class ConfigUtil {
         // 接口类扫描路径
         actionPath: '',
         // 全局异常处理类
-        errorAdvice: ''
+        errorAdvice: '',
+        // 是否允许跨域
+        allowCross: false
     }
 
     constructor() {
