@@ -13,7 +13,7 @@ class ErrorUtil {
         // 如果没有配置全局异常处理类则直接返回错误
         if (ConfigUtil.config.errorAdvice) {
             // 引入异常处理类
-            const errorAdvice = require('..\\..\\' + ConfigUtil.config.errorAdvice);
+            const errorAdvice = require('../../' + ConfigUtil.config.errorAdvice);
             for (let adviceKey in errorAdvice) {
                 const advice = errorAdvice[adviceKey];
                 const errorAdviceKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(advice))

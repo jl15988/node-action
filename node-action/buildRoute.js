@@ -22,7 +22,7 @@ class BuildRoute {
             const actions = {};
             for (let module of modules) {
                 // 引入模块儿
-                const path = module.replace("src", "..\\src");
+                const path = module.replace("src", "../src");
                 const req = require(path);
                 for (let reqKey in req) {
                     // if ('BaseModule' === reqKey) continue;
