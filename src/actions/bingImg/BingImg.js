@@ -1,6 +1,7 @@
 const {BingImgData} = require("./domain/BingImgData");
-const RequestUtil = require("../../utils/RequestUtil");
+const RequestUtil = require("../../utils/HttpUtil");
 const {ModuleType} = require("../base/ModuleType");
+const {CustomError} = require("../../errors/CustomError");
 
 class BingImg {
 
@@ -12,15 +13,14 @@ class BingImg {
         other: ""
     }
 
-    $$getData({number, format}) {
-        return new Promise(async resolve => {
-            const api = BingImg.api.replace("{format}", format || 'js').replace("{number}", number || '1');
+    async $$getData({number, format}) {
+        const api = BingImg.api.replace("{format}", format || 'js').replace("{number}", number || '1');
+        try {
             const res = await RequestUtil.get(api);
-            if (res) {
-                resolve(new BingImgData(res))
-            }
-            resolve('')
-        })
+            return new BingImgData(res);
+        } catch (e) {
+            throw new CustomError('请求api失败');
+        }
     }
 }
 

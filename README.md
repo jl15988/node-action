@@ -38,17 +38,18 @@ class BingImg {
 }
 ```
 
-## 4. 数据返回
+## 4. 全局异常处理
 
-接口方法中的逻辑代码，必须通过 Promise 返回，如：
+为方便开发者处理异常，在 advice 目录下设置了全局异常处理类，用于处理全局的异常，其中方法名应对应对应的异常类名称，而 common 方法将处理其他异常
 
 ```js
-class BingImg {
+class GlobalErrorAdvice {
+    CustomError() {
 
-    $$getData({number, format}) {
-        return new Promise(resolve => {
-            resolve('')
-        })
+    }
+    
+    common() {
+        
     }
 }
 ```

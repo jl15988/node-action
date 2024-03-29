@@ -1,4 +1,5 @@
 const {FileUtil} = require("./utils/FileUtil");
+const {config} = require("./config");
 
 /**
  * 构建路由
@@ -7,14 +8,14 @@ class BuildRoute {
 
     build(cb) {
         // 获取所有module，并组装地址
-        FileUtil.getFilesInDirectory('src/modules').then(modules => {
+        FileUtil.getFilesInDirectory(config.actionPath).then(modules => {
             const actions = {};
             for (let module of modules) {
                 // 引入模块儿
                 const path = module.replace("src", ".");
                 const req = require(path);
                 for (let reqKey in req) {
-                    if ('BaseModule' === reqKey) continue;
+                    // if ('BaseModule' === reqKey) continue;
                     const moduleInstance = req[reqKey];
                     if (moduleInstance.type && moduleInstance.type === 'action') {
                         actions[reqKey] = moduleInstance;

@@ -2,25 +2,29 @@ const http = require('http');
 const server = http.createServer();
 const {BuildRoute} = require("./buildRoute");
 const {Result} = require("./lang/Result");
+const {config} = require("./config");
+const {ResponseUtil} = require("./utils/ResponseUtil");
+const {UrlUtil} = require("./utils/UrlUtil");
+const {JSONUtil} = require("./utils/JSONUtil");
+const {GlobalErrorAdvice} = require("./advice/GlobalErrorAdvice");
 
 BuildRoute.build((routes) => {
     // 启动服务
     server.on('request', function (request, response) {
         // 获取请求地址
         const url = request.url;
-        // 获取请求参数
-        const urlObj = new URL('http://127.0.0.1/' + url);
+        const tempUrl = 'http://127.0.0.1/' + url;
+        const urlObj = new URL(tempUrl);
         const pathname = urlObj.pathname.substring(2);
-        const searchParams = new URLSearchParams(urlObj.search);
-        const params = {};
-        for (const [key, value] of searchParams) {
-            params[key] = value;
-        }
-        // 设置响应内容类型
-        response.setHeader('Content-Type', 'application/json; charset=utf8')
-        // 允许跨域
-        response.setHeader('Access-Control-Allow-Methods', '*') //允许哪些请求方式  *代表不限制
-        response.setHeader('Access-Control-Allow-Origin', '*') //允许哪些请求域名  *代表不限制
+
+        // 获取请求参数
+        const params = UrlUtil.getParams(tempUrl);
+        // 将request和response注入到参数中
+        params['HttpRequest'] = request;
+        params['HttpResponse'] = response;
+
+        ResponseUtil.setHeaderContentTypeJSON(response);
+        ResponseUtil.allowCross(response);
 
         // 判断请求地址是否存在
         const routesKeys = Object.keys(routes);
@@ -30,17 +34,38 @@ BuildRoute.build((routes) => {
         // 根据请求地址执行对应的方法并返回数据
         for (let routesKey in routes) {
             if (pathname === routesKey) {
-                routes[routesKey](params).then(res => {
-                    const result = Result.success(res);
-                    response.end(result);
+                new Promise(async (resolve, reject) => {
+                    try {
+                        // 执行对应的方法
+                        const res = await routes[routesKey](params)
+                        resolve(res);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }).then(res => {
+                    response.end(ResponseUtil.relResult(res));
                 }).catch(e => {
-                    const result = Result.fail();
-                    response.end(result);
+                    console.error(e)
+                    // 处理异常，先判断有没有对应的全局异常处理，没有的话返回异常信息
+                    const errorAdviceKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(GlobalErrorAdvice))
+                    for (let errorAdviceKey of errorAdviceKeys) {
+                        if (errorAdviceKey === 'common' || (errorAdviceKey !== 'constructor' && e.constructor.name === errorAdviceKey)) {
+                            try {
+                                const errorRes = GlobalErrorAdvice[errorAdviceKey](e);
+                                response.end(ResponseUtil.relResult(errorRes));
+                                return;
+                            } catch (e) {
+                                response.end(e.message);
+                                return;
+                            }
+                        }
+                    }
+                    response.end(e.message);
                 })
             }
         }
     });
-    server.listen(9300, function () {
+    server.listen(config.port, function () {
         console.log('服务器启动成功');
     });
 });
