@@ -4,6 +4,8 @@
 
 在类上添加 type = 'action' 表明当前是一个接口类，项目中提供了 ModuleType 类，可直接选择其中的类型
 
+包括：action（html）、jsonAction（json）、textAction（纯文本）
+
 ```js
 class BingImg {
 
@@ -51,5 +53,20 @@ class GlobalErrorAdvice {
     common() {
         
     }
+}
+```
+
+## 5. 配置
+
+通过在项目根目录创建 node-action-config.js 来对 node-action 进行相关配置
+
+```js
+exports.config = {
+    // 端口号
+    port: 9300,
+    // 接口类扫描路径
+    actionPath: 'src/actions',
+    // 全局异常处理类
+    errorAdvice: 'src/advice/GlobalErrorAdvice'
 }
 ```

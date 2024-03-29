@@ -4,6 +4,7 @@ const path = require("path");
 class FileUtil {
     /**
      * 获取文件加下的所有文件
+     * @param directory {string | Buffer |URL}
      */
     getFilesInDirectory(directory) {
         return new Promise((resolve, reject) => {
@@ -27,6 +28,17 @@ class FileUtil {
                 resolve(resArr);
             });
         });
+    }
+
+
+
+    /**
+     * 判断文件是否存在
+     * @param path {string | Buffer |URL}
+     * @returns {boolean}
+     */
+    isExist(path) {
+        return fs.existsSync(path);
     }
 }
 

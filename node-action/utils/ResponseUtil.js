@@ -1,4 +1,5 @@
 const {JSONUtil} = require("./JSONUtil");
+const {ContentType} = require("./ContentType");
 
 /**
  * 响应工具
@@ -9,7 +10,21 @@ class ResponseUtil {
      * 设置响应头返回内容为JSON格式
      */
     setHeaderContentTypeJSON(response) {
-        response.setHeader('Content-Type', 'application/json; charset=utf8');
+        response.setHeader('Content-Type', ContentType.APPLICATION_JSON + '; charset=utf8');
+    }
+
+    /**
+     * 设置响应头返回内容为Text格式
+     */
+    setHeaderContentTypeText(response) {
+        response.setHeader('Content-Type', ContentType.TEXT_PLAIN + '; charset=utf8');
+    }
+
+    /**
+     * 设置响应头返回内容为Html格式
+     */
+    setHeaderContentTypeHtml(response) {
+        response.setHeader('Content-Type', ContentType.TEXT_HTML + '; charset=utf8');
     }
 
     /**

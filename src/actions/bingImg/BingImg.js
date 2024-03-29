@@ -1,11 +1,11 @@
 const {BingImgData} = require("./domain/BingImgData");
-const RequestUtil = require("../../utils/HttpUtil");
-const {ModuleType} = require("../base/ModuleType");
+const RequestUtil = require("../../../node-action/utils/HttpUtil");
+const {ModuleType} = require("../../../node-action/base/ModuleType");
 const {CustomError} = require("../../errors/CustomError");
 
 class BingImg {
 
-    type = ModuleType.action;
+    type = ModuleType.jsonAction;
     static baseUrl = "https://www.bing.com/";
     static api = "https://www.bing.com/HPImageArchive.aspx?format={format}&n={number}"
     static formatMap = {

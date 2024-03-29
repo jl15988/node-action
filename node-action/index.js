@@ -1,12 +1,12 @@
 const http = require('http');
 const server = http.createServer();
 const {BuildRoute} = require("./buildRoute");
-const {Result} = require("./lang/Result");
-const {config} = require("./config");
+const {Result} = require("../src/lang/Result");
 const {ResponseUtil} = require("./utils/ResponseUtil");
 const {UrlUtil} = require("./utils/UrlUtil");
-const {JSONUtil} = require("./utils/JSONUtil");
-const {GlobalErrorAdvice} = require("./advice/GlobalErrorAdvice");
+const {ConfigUtil} = require("./utils/ConfigUtil");
+const {ErrorUtil} = require("./utils/ErrorUtil");
+const {ModuleType} = require("./base/ModuleType");
 
 BuildRoute.build((routes) => {
     // 启动服务
@@ -23,7 +23,6 @@ BuildRoute.build((routes) => {
         params['HttpRequest'] = request;
         params['HttpResponse'] = response;
 
-        ResponseUtil.setHeaderContentTypeJSON(response);
         ResponseUtil.allowCross(response);
 
         // 判断请求地址是否存在
@@ -36,8 +35,19 @@ BuildRoute.build((routes) => {
             if (pathname === routesKey) {
                 new Promise(async (resolve, reject) => {
                     try {
+                        const route = routes[routesKey];
+                        switch (route.type) {
+                            case ModuleType.jsonAction:
+                                ResponseUtil.setHeaderContentTypeJSON(response);
+                                break;
+                            case ModuleType.textAction:
+                                ResponseUtil.setHeaderContentTypeText(response);
+                                break;
+                            default:
+                                ResponseUtil.setHeaderContentTypeHtml(response);
+                        }
                         // 执行对应的方法
-                        const res = await routes[routesKey](params)
+                        const res = await route.method(params)
                         resolve(res);
                     } catch (e) {
                         reject(e);
@@ -46,27 +56,13 @@ BuildRoute.build((routes) => {
                     response.end(ResponseUtil.relResult(res));
                 }).catch(e => {
                     console.error(e)
-                    // 处理异常，先判断有没有对应的全局异常处理，没有的话返回异常信息
-                    const errorAdviceKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(GlobalErrorAdvice))
-                    for (let errorAdviceKey of errorAdviceKeys) {
-                        if (errorAdviceKey === 'common' || (errorAdviceKey !== 'constructor' && e.constructor.name === errorAdviceKey)) {
-                            try {
-                                const errorRes = GlobalErrorAdvice[errorAdviceKey](e);
-                                response.end(ResponseUtil.relResult(errorRes));
-                                return;
-                            } catch (e) {
-                                response.end(e.message);
-                                return;
-                            }
-                        }
-                    }
-                    response.end(e.message);
+                    response.end(ErrorUtil.handle(e));
                 })
             }
         }
     });
-    server.listen(config.port, function () {
-        console.log('服务器启动成功');
+    server.listen(ConfigUtil.config.port, function () {
+        console.log('服务器启动成功，端口号：' + server.address().port);
     });
 });
 
